@@ -9,6 +9,19 @@ USERNAME = None
 PASSWORD = None
 
 
+def create_subnet(session, tenant_name, gw):
+    url = "/api/node/mo/uni/tn-{0}/BD-{0}-BD.json".format(tenant_name)
+    payload = {"fvSubnet": {
+        "attributes": {
+            "ip": gw,
+            "rn": "subnet-[{}]".format(gw),
+            "scope": "public"
+           }
+        }
+    }
+    return session.push_to_apic(url, payload)
+
+
 def clone_tenant(session, existing, new):
     print "Creating new tenant {} using {} as a template".format(new, existing)
     url = '/api/node/class/fvTenant.json' \
@@ -51,8 +64,12 @@ def clone():
         return render_template('index.html', tenants=tenants)
 
     elif request.method == 'POST':
+        print request.form
         new_tenant = clone_tenant(session, request.form['srctenant'], request.form['newtenant'])
+        new_subnet = create_subnet(session, request.form['newtenant'], request.form['gw'])
+        print new_subnet.text
         if new_tenant.ok:
+
             flash("Successfully created tenant {}".format(request.form['newtenant']), 'success')
             tenants = Tenant.get(session)
             return render_template('index.html', tenants=tenants)
