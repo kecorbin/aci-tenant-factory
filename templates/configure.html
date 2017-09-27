@@ -1,17 +1,17 @@
 {% extends 'layout.html' %}
 {% set active_page = "configure" %}
 {% block content %}
-<div class="container-fluid">
+<div class="container">
     <form action="/configure" method="POST">
         <div class="form-group">
           <label for="apic">APIC IP:</label>
-          <input name="apic" type="text" class="form-control" id="apic">
+          <input name="apic" type="text" class="form-control input-lg" id="apic">
 
           <label for="username">Username:</label>
-          <input name="username" type="text" class="form-control" id="username">
+          <input name="username" type="text" class="form-control input-lg" id="username">
 
           <label for="password">Password:</label>
-          <input name="password"type="password" class="form-control" id="password">
+          <input name="password"type="password" class="form-control input-lg" id="password">
 
           <button type="submit" class="btn btn-default">Submit</button>
         </div>
