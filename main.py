@@ -4,14 +4,17 @@ from acitoolkit.acitoolkit import Tenant, Session
 from flask import Flask, render_template, request, flash, redirect
 app = Flask(__name__)
 
-APIC=None
-USERNAME=None
-PASSWORD=None
+APIC = None
+USERNAME = None
+PASSWORD = None
 
 
 def clone_tenant(session, existing, new):
     print "Creating new tenant {} using {} as a template".format(new, existing)
-    url = '/api/node/class/fvTenant.json?rsp-prop-include=config-only&query-target-filter=and(eq(fvTenant.name,"{}"))'.format(existing)
+    url = '/api/node/class/fvTenant.json' \
+          '?rsp-prop-include=config-only' \
+          '&rsp-subtree=full' \
+          '&query-target-filter=and(eq(fvTenant.name,"{}"))'.format(existing)
     source = session.get(url).json()['imdata'][0]
     new = json.dumps(source).replace(existing, new)
     return session.push_to_apic('/api/mo/uni.json', data=json.loads(new))
@@ -39,7 +42,7 @@ def clone():
         flash('You must configure your environment before proceeding', 'warning')
         return redirect('/configure')
     else:
-        session = Session('http://{}'.format(APIC), USERNAME,PASSWORD)
+        session = Session('http://{}'.format(APIC), USERNAME, PASSWORD)
         print session.login()
 
     if request.method == 'GET':
@@ -53,7 +56,6 @@ def clone():
             flash("Successfully created tenant {}".format(request.form['newtenant']), 'success')
             tenants = Tenant.get(session)
             return render_template('index.html', tenants=tenants)
-
 
 
 if __name__ == '__main__':
